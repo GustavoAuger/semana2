@@ -1,0 +1,110 @@
+# Binarios compilados de Go
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Archivos de Go
+go.work
+go.work.sum
+
+# Directorios de dependencias
+vendor/
+
+# Archivos de IDEs y editores
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Archivos de logs
+*.log
+logs/
+
+# Archivos de base de datos
+*.db
+*.sqlite
+*.sqlite3
+
+# Variables de entorno
+.env
+.env.local
+.env.*.local
+
+# Datos de Docker
+docker-compose.override.yml
+*.pid
+
+# Archivos temporales
+tmp/
+temp/
+*.tmp
+
+# Archivos de cobertura de tests
+coverage.txt
+coverage.html
+*.cover
+*.coverprofile
+
+# Archivos de profiling
+*.prof
+*.pprof
+
+# Archivos de build
+build/
+dist/
+bin/
+
+# Archivos de sistema operativo
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Archivos de backup
+*.bak
+*.backup
+*~
+
+# Datos de Consul (si usas volúmenes locales)
+consul_data/
+
+# Datos de PostgreSQL (si usas volúmenes locales)
+postgres_data/
+postgres_data_oferta/
+postgres_data_especificacion/
+
+# Certificados SSL (no commitear en producción)
+*.pem
+*.key
+*.crt
+*.cert
+
+# Archivos de configuración sensibles
+secrets/
+credentials/
+
+# Node modules (si usas algún frontend)
+node_modules/
+
+# Archivos de debug
+debug
+__debug_bin
+
+# Air (hot reload para Go)
+tmp/
+.air.toml
+
+# Archivos de Terraform (si usas IaC)
+*.tfstate
+*.tfstate.*
+.terraform/
+
+# Archivos de Kubernetes (si tienes secretos)
+*-secret.yaml
+*-secrets.yaml
