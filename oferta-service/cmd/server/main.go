@@ -100,7 +100,7 @@ func main() {
 		ofertas := api.Group("/ofertas")
 		{
 			ofertas.GET("", ofertaHandler.GetOfertas)
-			ofertas.GET(":id", ofertaHandler.GetOferta)
+			ofertas.GET("/:id", ofertaHandler.GetOferta)
 		}
 	}
 

@@ -8,7 +8,7 @@ import (
 type EspecificacionRepository interface {
 	FindAll() ([]model.Especificacion, error)
 	FindByID(id uint) (*model.Especificacion, error)
-	FindByOfertaID(ofertaID uint) (*model.Especificacion, error)
+	FindByOfertaID(ofertaID int) (*model.Especificacion, error)
 	Create(especificacion *model.Especificacion) error
 	Update(especificacion *model.Especificacion) error
 	Delete(id uint) error
@@ -38,7 +38,7 @@ func (r *especificacionRepository) FindByID(id uint) (*model.Especificacion, err
 	return &especificacion, nil
 }
 
-func (r *especificacionRepository) FindByOfertaID(ofertaID uint) (*model.Especificacion, error) {
+func (r *especificacionRepository) FindByOfertaID(ofertaID int) (*model.Especificacion, error) {
 	var especificacion model.Especificacion
 	if err := r.DB.Where("oferta_id = ?", ofertaID).First(&especificacion).Error; err != nil {
 		return nil, err

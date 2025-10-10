@@ -4,9 +4,10 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/gin-gonic/gin"
 	"oferta-service/internal/model"
 	"oferta-service/internal/service"
+
+	"github.com/gin-gonic/gin"
 )
 
 type OfertaHandler struct {

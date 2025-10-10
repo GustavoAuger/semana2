@@ -43,7 +43,7 @@ Gestión de ofertas con CRUD completo.
 ### 2. **especificacion-service** (Puerto 8081)
 Gestión de especificaciones con CRUD parcial según especificaciones de lo solicitado.
 
-### 3. **Traefik** (Puerto 80)
+### 3. **Traefik** (Puerto 80) (puerto 8080 para revisar en el navegador)
 API Gateway que enruta el tráfico a los microservicios.
 
 ### 4. **Consul** (Puerto 8500)
@@ -86,7 +86,6 @@ docker-compose logs -f traefik
 
 ## 🌐 Endpoints
 
-### A través del API Gateway (Puerto 80) - **RECOMENDADO**
 
 #### Oferta Service
 ```bash
@@ -97,26 +96,8 @@ curl http://localhost/api/v1/ofertas/health
 curl http://localhost/api/v1/ofertas
 
 # Obtener una oferta por ID
-curl http://localhost/api/v1/ofertas/1
-
-# Crear una nueva oferta
-curl -X POST http://localhost/api/v1/ofertas \
-  -H "Content-Type: application/json" \
-  -d '{
-
-  }'
-
-# Actualizar una oferta
-curl -X PUT http://localhost/api/v1/ofertas/1 \
-  -H "Content-Type: application/json" \
-  -d '{
-
-  }'
-
-# Eliminar una oferta
-curl -X DELETE http://localhost/api/v1/ofertas/1
+curl http://localhost/api/v1/ofertas/{id}
 ```
-
 #### Especificacion Service
 ```bash
 # Health check
@@ -132,12 +113,67 @@ curl http://localhost/api/v1/especificaciones/1
 curl -X POST http://localhost/api/v1/especificaciones \
   -H "Content-Type: application/json" \
   -d '{
-
+    "oferta_id": 1,
+    "numero_vacantes": 2,
+    "personal_a_cargo": 3,
+    "tipo_contrato": "Indefinido",
+    "modalidad_trabajo": "Híbrido",
+    "categoria": "Desarrollo de Software",
+    "subcategoria": "Backend",
+    "sector": "Tecnología",
+    "nivel_profesional": "Senior",
+    "departamento": "Ingeniería",
+    "experiencia_minima": "5 años",
+    "jornada_laboral": "Completa",
+    "formacion_minima": "Grado en Informática"
   }'
+
+# Actualizar una especificación
+curl -X PUT http://localhost/api/v1/especificaciones/1 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "oferta_id": 1,
+    "numero_vacantes": 3,
+    "personal_a_cargo": 5,
+    "tipo_contrato": "Indefinido",
+    "modalidad_trabajo": "Remoto",
+    "categoria": "Desarrollo de Software",
+    "subcategoria": "Full Stack",
+    "sector": "Tecnología",
+    "nivel_profesional": "Senior",
+    "departamento": "Ingeniería",
+    "experiencia_minima": "5 años",
+    "jornada_laboral": "Completa",
+    "formacion_minima": "Grado en Informática o equivalente"
+  }'
+
+# Eliminar una especificación
+curl -X DELETE http://localhost/api/v1/especificaciones/1
 ```
 
 ### Acceso Directo a los Servicios (Solo para desarrollo)
 
+**NOTA:** Los puertos directos (8081, 8082) están comentados en `docker-compose.yml` por seguridad. 
+
+Para habilitar el acceso directo en desarrollo, descomenta las líneas de `ports` en el archivo `docker-compose.yml`:
+
+```yaml
+# oferta-service
+ports:
+  - "8082:8082"
+
+# especificacion-service
+ports:
+  - "8081:8081"
+```
+
+Luego reinicia los servicios:
+```bash
+docker-compose down
+docker-compose up -d
+```
+
+Y podrás acceder directamente:
 ```bash
 # oferta-service (Puerto 8082)
 curl http://localhost:8082/api/v1/health
@@ -160,6 +196,25 @@ http://localhost:8500
 
 ## 🗄️ Base de Datos
 
+### Cargar Datos Dummy
+
+Para cargar datos de prueba en las bases de datos:
+
+**En Windows (PowerShell):**
+```powershell
+.\load-dummy-data.ps1
+```
+
+**En Linux/Mac:**
+```bash
+chmod +x load-dummy-data.sh
+./load-dummy-data.sh
+```
+
+Esto cargará:
+- **10 ofertas** de ejemplo en diferentes áreas y países
+- **10 especificaciones** correspondientes a cada oferta
+
 ### Conexión a PostgreSQL
 
 #### Base de datos de ofertas
@@ -170,6 +225,24 @@ docker exec -it db_oferta psql -U postgres -d ofertas_db
 #### Base de datos de especificaciones
 ```bash
 docker exec -it db_especificacion psql -U postgres -d especificaciones_db
+```
+
+### Consultas útiles
+
+```sql
+-- Ver todas las ofertas
+SELECT id, titulo, estado, pais FROM ofertas;
+
+-- Ver todas las especificaciones
+SELECT id, oferta_id, tipo_contrato, modalidad_trabajo FROM especificaciones;
+
+-- Contar ofertas por estado
+SELECT estado, COUNT(*) FROM ofertas GROUP BY estado;
+
+-- Ver ofertas con sus especificaciones
+SELECT o.titulo, e.tipo_contrato, e.modalidad_trabajo 
+FROM ofertas o 
+LEFT JOIN especificaciones e ON o.id = e.oferta_id;
 ```
 
 ## 🔧 Desarrollo
@@ -287,21 +360,29 @@ curl http://localhost:8080/api/http/routers
 - `DB_NAME`: Nombre de la base de datos (default: `especificaciones_db`)
 - `CONSUL_HTTP_ADDR`: Dirección de Consul (default: `consul:8500`)
 - `SERVICE_NAME`: Nombre del servicio (default: `especificacion-service`)
-- `SERVICE_PORT`: Puerto del servicio (default: `8081`)
 
-## 🔒 Seguridad
 
-- En producción, NO expongas los puertos de los servicios directamente (8081, 8082)
-- Usa HTTPS con certificados SSL/TLS
-- Implementa autenticación JWT
-- Configura rate limiting en Traefik
-- Usa variables de entorno para credenciales sensibles
+
+### ✅ Implementado
+
+- **Puertos protegidos**: Los puertos de los servicios (8081, 8082) están comentados por defecto. Todo el tráfico pasa por Traefik (puerto 80).
+- **Red interna**: Los servicios solo son accesibles dentro de la red Docker `app-network`.
+- **API Gateway**: Traefik actúa como punto único de entrada, facilitando la implementación de políticas de seguridad.
+
+### 🔐 Recomendaciones adicionales para producción
+
+- **HTTPS**: Configura certificados SSL/TLS en Traefik (Let's Encrypt)
+- **Autenticación**: Implementa JWT o OAuth2 para autenticar usuarios
+- **Rate Limiting**: Configura límites de peticiones en Traefik
+- **Variables de entorno**: Usa secretos de Docker o variables de entorno seguras
+- **Firewall**: Configura reglas de firewall para limitar el acceso
+- **Monitoreo**: Implementa logging y monitoreo con Prometheus/Grafana
+- **Actualizaciones**: Mantén las imágenes Docker actualizadas
 
 ## 📚 Tecnologías Utilizadas
 
 - **Go 1.21+**: Lenguaje de programación
 - **Gin**: Framework web para Go
-- **GORM**: ORM para Go
 - **PostgreSQL**: Base de datos relacional
 - **Traefik v2.10**: API Gateway y reverse proxy
 - **Consul 1.15**: Service Discovery

@@ -9,7 +9,7 @@ import (
 type EspecificacionService interface {
 	GetAllEspecificaciones() ([]model.Especificacion, error)
 	GetEspecificacionByID(id uint) (*model.Especificacion, error)
-	GetEspecificacionByOfertaID(ofertaID uint) (*model.Especificacion, error)
+	GetEspecificacionByOfertaID(ofertaID int) (*model.Especificacion, error)
 	CreateEspecificacion(especificacion *model.Especificacion) error
 	UpdateEspecificacion(especificacion *model.Especificacion) error
 	DeleteEspecificacion(id uint) error
@@ -31,13 +31,13 @@ func (s *especificacionService) GetEspecificacionByID(id uint) (*model.Especific
 	return s.repo.FindByID(id)
 }
 
-func (s *especificacionService) GetEspecificacionByOfertaID(ofertaID uint) (*model.Especificacion, error) {
+func (s *especificacionService) GetEspecificacionByOfertaID(ofertaID int) (*model.Especificacion, error) {
 	return s.repo.FindByOfertaID(ofertaID)
 }
 
 func (s *especificacionService) CreateEspecificacion(especificacion *model.Especificacion) error {
 	// Verificar si ya existe una especificación para esta oferta
-	existing, _ := s.repo.FindByOfertaID(especificacion.OfertaID)
+	existing, _ := s.repo.FindByOfertaID(int(especificacion.OfertaID))
 	if existing != nil {
 		return errors.New("ya existe una especificación para esta oferta")
 	}

@@ -4,9 +4,10 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/gin-gonic/gin"
 	"especificacion-service/internal/model"
 	"especificacion-service/internal/service"
+
+	"github.com/gin-gonic/gin"
 )
 
 type EspecificacionHandler struct {
@@ -62,7 +63,7 @@ func (h *EspecificacionHandler) GetEspecificacionPorOferta(c *gin.Context) {
 		return
 	}
 
-	especificacion, err := h.service.GetEspecificacionByOfertaID(uint(ofertaID))
+	especificacion, err := h.service.GetEspecificacionByOfertaID(int(ofertaID))
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Especificación no encontrada para esta oferta"})
 		return

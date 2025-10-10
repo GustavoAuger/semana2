@@ -2,6 +2,7 @@ package repository
 
 import (
 	"oferta-service/internal/model"
+
 	"gorm.io/gorm"
 )
 
