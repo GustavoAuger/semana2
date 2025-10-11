@@ -4,8 +4,6 @@ Arquitectura de microservicios en Go con API Gateway (Traefik), Service Discover
 
 ## 🏗️ Arquitectura
 
-```
-┌─────────────────────────────────────────────────────────────┐
 ```mermaid
 graph TD
     Cliente -->|HTTP| Traefik
@@ -15,7 +13,6 @@ graph TD
     especificacion-service -->|Registra/Descubre| Consul
     oferta-service -->|Persistencia| PostgreSQL1[(PostgreSQL:5432)]
     especificacion-service -->|Persistencia| PostgreSQL2[(PostgreSQL:5433)]
-```
 ```
 
 ## 🗃️ Inicialización de Datos
