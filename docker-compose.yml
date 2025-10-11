@@ -30,6 +30,7 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data_oferta:/var/lib/postgresql/data
+      - ./oferta-service/scripts/init_db.sql:/docker-entrypoint-initdb.d/init_db.sql # Carga de datos dummy
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
@@ -50,6 +51,7 @@ services:
       - "5433:5432"
     volumes:
       - postgres_data_especificacion:/var/lib/postgresql/data
+      - ./especificacion-service/scripts/init_db.sql:/docker-entrypoint-initdb.d/init_db.sql # Carga de datos dummy
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
@@ -79,7 +81,7 @@ services:
     networks:
       - app-network
     # ports:
-    #   - "8082:8082"  # Comentado para producción - acceso solo vía Traefik
+    #   - "8082:8082"  # Comentado para producción - acceso solo vía Traefik (GATEWAY)
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.oferta.rule=PathPrefix(`/api/v1/ofertas`)"
@@ -109,7 +111,7 @@ services:
     networks:
       - app-network
     # ports:
-    #   - "8081:8081"  # Comentado para producción - acceso solo vía Traefik
+    #   - "8081:8081"  # Comentado para producción - acceso solo vía Traefik (GATEWAY)
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.especificacion.rule=PathPrefix(`/api/v1/especificaciones`)"

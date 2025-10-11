@@ -6,34 +6,64 @@ Arquitectura de microservicios en Go con API Gateway (Traefik), Service Discover
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                         Cliente                             │
-└────────────────────────┬────────────────────────────────────┘
-                         │
-                         ▼
-┌─────────────────────────────────────────────────────────────┐
-│                    Traefik (Puerto 80)                      │
-│                      API Gateway                            │
-└────────┬───────────────────────────────────┬────────────────┘
-         │                                   │
-         ▼                                   ▼
-┌────────────────────┐            ┌─────────────────────────┐
-│  oferta-service    │            │ especificacion-service  │
-│    (Puerto 8082)   │            │     (Puerto 8081)       │
-└────────┬───────────┘            └──────────┬──────────────┘
-         │                                   │
-         ▼                                   ▼
-┌────────────────────┐            ┌─────────────────────────┐
-│  PostgreSQL        │            │    PostgreSQL           │
-│  (Puerto 5432)     │            │    (Puerto 5433)        │
-└────────────────────┘            └─────────────────────────┘
-         │                                   │
-         └───────────────┬───────────────────┘
-                         ▼
-                ┌────────────────────┐
-                │  Consul (8500)     │
-                │ Service Discovery  │
-                └────────────────────┘
+```mermaid
+graph TD
+    Cliente -->|HTTP| Traefik
+    Traefik -->|Rutas| oferta-service
+    Traefik -->|Rutas| especificacion-service
+    oferta-service -->|Registra/Descubre| Consul
+    especificacion-service -->|Registra/Descubre| Consul
+    oferta-service -->|Persistencia| PostgreSQL1[(PostgreSQL:5432)]
+    especificacion-service -->|Persistencia| PostgreSQL2[(PostgreSQL:5433)]
 ```
+```
+
+## 🗃️ Inicialización de Datos
+
+Cada servicio incluye un script SQL de inicialización ubicado en `[servicio]/scripts/init_db.sql` que realiza las siguientes acciones:
+
+1. **Creación de tablas** con `IF NOT EXISTS` para evitar conflictos
+2. Inserción de datos de prueba para desarrollo
+3. Configuración de secuencias para evitar conflictos con IDs
+
+### Integración con ORM (GORM)
+
+La estructura de la base de datos está diseñada para funcionar perfectamente con GORM:
+
+- **Campos estándar**: `id`, `created_at`, `updated_at`, `deleted_at`
+- **Tipos de datos compatibles** con la mayoría de ORMs
+- **Nombres de columnas** en formato snake_case
+- **Relaciones** definidas de forma explícita
+
+### Estructura de tablas
+
+#### oferta-service
+```sql
+CREATE TABLE IF NOT EXISTS ofertas (
+    id SERIAL PRIMARY KEY,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    deleted_at TIMESTAMP WITH TIME ZONE,
+    -- ... otros campos
+);
+```
+
+#### especificacion-service
+```sql
+CREATE TABLE IF NOT EXISTS especificaciones (
+    id SERIAL PRIMARY KEY,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    deleted_at TIMESTAMP WITH TIME ZONE,
+    oferta_id INTEGER NOT NULL,
+    -- ... otros campos
+);
+```
+
+Esta estructura garantiza que:
+- No hay conflictos con las migraciones automáticas del ORM
+- Los datos de prueba están disponibles inmediatamente
+- La integración con GORM es transparente
 
 ## 🚀 Servicios
 
@@ -261,6 +291,8 @@ Go-Micro/
 │   │   ├── repository/
 │   │   ├── model/
 │   │   └── consul/
+│   ├── scripts/
+│   │   └── init_db.sql
 │   ├── Dockerfile
 │   └── go.mod
 ├── especificacion-service/
@@ -273,6 +305,8 @@ Go-Micro/
 │   │   ├── repository/
 │   │   ├── model/
 │   │   └── consul/
+│   ├── scripts/
+│   │   └── init_db.sql
 │   ├── Dockerfile
 │   └── go.mod
 ├── docker-compose.yml
