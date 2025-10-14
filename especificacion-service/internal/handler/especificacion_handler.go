@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"especificacion-service/internal/dto"
 	"especificacion-service/internal/model"
 	"especificacion-service/internal/service"
 
@@ -69,7 +70,7 @@ func (h *EspecificacionHandler) GetEspecificacionPorOferta(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, especificacion)
+	c.JSON(http.StatusOK, gin.H{"data": especificacion})
 }
 
 // UpdateEspecificacion actualiza una especificación existente
@@ -94,7 +95,7 @@ func (h *EspecificacionHandler) UpdateEspecificacion(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, updateData)
+	c.JSON(http.StatusOK, gin.H{"data": updateData})
 }
 
 // DeleteEspecificacion elimina una especificación
@@ -117,12 +118,12 @@ func (h *EspecificacionHandler) DeleteEspecificacion(c *gin.Context) {
 func (h *EspecificacionHandler) ListEspecificaciones(c *gin.Context) {
 	especificaciones, err := h.service.GetAllEspecificaciones()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error al listar las especificaciones"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error al obtener las especificaciones"})
 		return
 	}
 
 	if especificaciones == nil {
-		especificaciones = []model.Especificacion{} // Retornar array vacío en lugar de null
+		especificaciones = []dto.EspecificacionResponse{} // Retornar array vacío en lugar de null
 	}
 
 	c.JSON(http.StatusOK, especificaciones)

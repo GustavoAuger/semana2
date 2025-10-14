@@ -9,6 +9,7 @@ import (
 	"syscall"
 	"time"
 
+	ofertaclient "especificacion-service/internal/clients/ofertaclient"
 	"especificacion-service/internal/consul"
 	"especificacion-service/internal/handler"
 	"especificacion-service/internal/model"
@@ -83,8 +84,10 @@ func main() {
 	})
 
 	// Inicializar capas
+	ofertaClient := ofertaclient.NewClient() // Usando Traefik como punto de entrada
+
 	especificacionRepo := repository.NewEspecificacionRepository(db)
-	especificacionService := service.NewEspecificacionService(especificacionRepo)
+	especificacionService := service.NewEspecificacionService(especificacionRepo, ofertaClient)
 	especificacionHandler := handler.NewEspecificacionHandler(especificacionService)
 
 	// Grupo de rutas de la API
