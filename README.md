@@ -272,7 +272,6 @@ FROM ofertas o
 LEFT JOIN especificaciones e ON o.id = e.oferta_id;
 ```
 
-## 🔧 Desarrollo
 
 ### Estructura del Proyecto
 

@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"log"
 	"net/http"
 	"strconv"
 
@@ -65,6 +66,8 @@ func (h *EspecificacionHandler) GetEspecificacionPorOferta(c *gin.Context) {
 
 	especificacion, err := h.service.GetEspecificacionByOfertaID(int(ofertaID))
 	if err != nil {
+		// Log del error para debugging
+		log.Printf("Error al buscar especificación para oferta ID %d: %v", ofertaID, err)
 		c.JSON(http.StatusNotFound, gin.H{"error": "Especificación no encontrada para esta oferta"})
 		return
 	}

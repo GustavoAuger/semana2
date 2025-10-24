@@ -80,8 +80,8 @@ services:
       - SERVICE_PORT=8082
     networks:
       - app-network
-    # ports:
-    #   - "8082:8082"  # Comentado para producción - acceso solo vía Traefik (GATEWAY)
+    ports:
+ #     - "8082:8082"  # Direct access for debugging
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.oferta.rule=PathPrefix(`/api/v1/ofertas`)"
@@ -110,8 +110,8 @@ services:
       - SERVICE_PORT=8081
     networks:
       - app-network
-    # ports:
-    #   - "8081:8081"  # Comentado para producción - acceso solo vía Traefik (GATEWAY)
+    ports:
+ #     - "8081:8081"  # Direct access for debugging
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.especificacion.rule=PathPrefix(`/api/v1/especificaciones`)"

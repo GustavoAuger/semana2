@@ -11,18 +11,17 @@ type Client struct {
 	baseURL string
 }
 
-// NewClient crea un nuevo cliente que usa Traefik como punto de entrada
+// NewClient crea un nuevo cliente que se conecta directamente al servicio de ofertas
 func NewClient() *Client {
-	// Usamos el nombre del servicio de Traefik en la red de Docker
-	// No es necesario el puerto 80 ya que es el puerto HTTP por defecto
+	// Usamos el nombre del servicio en la red de Docker
 	return &Client{
-		baseURL: "http://traefik/api/v1/ofertas",
+		baseURL: "http://oferta-service:8082/api/v1/ofertas",
 	}
 }
 
-// GetOfertaByID obtiene una oferta por su ID a través de Traefik
+// GetOfertaByID obtiene una oferta por su ID directamente del servicio de ofertas
 func (c *Client) GetOfertaByID(id int) (map[string]interface{}, error) {
-	// Construimos la URL usando la ruta base de Traefik
+	// Construimos la URL usando el servicio de ofertas directamente
 	url := fmt.Sprintf("%s/%d", c.baseURL, id)
 	resp, err := http.Get(url)
 	if err != nil {

@@ -70,7 +70,7 @@ func main() {
 	// Configurar CORS
 	r.Use(func(c *gin.Context) {
 		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
-		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
 
 		if c.Request.Method == "OPTIONS" {
@@ -101,6 +101,7 @@ func main() {
 		{
 			ofertas.GET("", ofertaHandler.GetOfertas)
 			ofertas.GET("/:id", ofertaHandler.GetOferta)
+			ofertas.POST("", ofertaHandler.PostOferta)
 		}
 	}
 

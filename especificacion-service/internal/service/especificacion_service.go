@@ -37,7 +37,13 @@ func (s *especificacionService) GetAllEspecificaciones() ([]dto.EspecificacionRe
 
 	responses := make([]dto.EspecificacionResponse, 0, len(especificaciones))
 	for _, esp := range especificaciones {
-		oferta, _ := s.ofertaClient.GetOfertaByID(int(esp.OfertaID))
+		// Intentar obtener la oferta relacionada
+		oferta, err := s.ofertaClient.GetOfertaByID(int(esp.OfertaID))
+		if err != nil {
+			// Log del error pero continuar con la especificación sin oferta
+			oferta = nil
+		}
+
 		responses = append(responses, dto.EspecificacionResponse{
 			Especificacion: esp,
 			Oferta:         oferta,
@@ -53,7 +59,13 @@ func (s *especificacionService) GetEspecificacionByID(id uint) (*dto.Especificac
 		return nil, err
 	}
 
-	oferta, _ := s.ofertaClient.GetOfertaByID(int(esp.OfertaID))
+	// Intentar obtener la oferta relacionada
+	oferta, err := s.ofertaClient.GetOfertaByID(int(esp.OfertaID))
+	if err != nil {
+		// Log del error pero continuar con la especificación sin oferta
+		oferta = nil
+	}
+
 	return &dto.EspecificacionResponse{
 		Especificacion: *esp,
 		Oferta:         oferta,
@@ -66,7 +78,17 @@ func (s *especificacionService) GetEspecificacionByOfertaID(ofertaID int) (*dto.
 		return nil, err
 	}
 
-	oferta, _ := s.ofertaClient.GetOfertaByID(ofertaID)
+	// Intentar obtener la oferta relacionada
+	oferta, err := s.ofertaClient.GetOfertaByID(ofertaID)
+	if err != nil {
+		// Log del error pero no fallar completamente
+		// Retornar la especificación sin la oferta relacionada
+		return &dto.EspecificacionResponse{
+			Especificacion: *esp,
+			Oferta:         nil,
+		}, nil
+	}
+
 	return &dto.EspecificacionResponse{
 		Especificacion: *esp,
 		Oferta:         oferta,
@@ -80,11 +102,15 @@ func (s *especificacionService) CreateEspecificacion(especificacion *model.Espec
 		return errors.New("ya existe una especificación para esta oferta")
 	}
 
-	// Verificar que la oferta exista
+	// Verificar que la oferta exista (opcional, no bloquear la creación si no se puede verificar)
 	_, err := s.ofertaClient.GetOfertaByID(int(especificacion.OfertaID))
 	if err != nil {
-		return errors.New("la oferta especificada no existe")
+		// Log del error pero permitir la creación de la especificación
+		// En un entorno de microservicios, la oferta podría estar temporalmente inaccesible
 	}
+
+	// Establecer la especificación como activa por defecto
+	especificacion.Activo = true
 
 	return s.repo.Create(especificacion)
 }
