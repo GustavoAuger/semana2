@@ -49,3 +49,43 @@ func (h *OfertaHandler) GetOferta(c *gin.Context) {
 
 	c.JSON(http.StatusOK, oferta)
 }
+
+// PostOferta: crea una nueva oferta
+func (h *OfertaHandler) PostOferta(c *gin.Context) {
+	var oferta model.Oferta
+	if err := c.ShouldBindJSON(&oferta); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Error al crear la oferta"})
+		return
+	}
+
+	createdOferta, err := h.ofertaService.CreateOferta(oferta)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error al crear la oferta"})
+		return
+	}
+
+	c.JSON(http.StatusOK, createdOferta)
+}
+
+// ModificarOferta: modifica una oferta existente
+func (h *OfertaHandler) ModificarOferta(c *gin.Context) {
+	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID inválido"})
+		return
+	}
+
+	var oferta model.Oferta
+	if err := c.ShouldBindJSON(&oferta); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Error al modificar la oferta"})
+		return
+	}
+
+	updatedOferta, err := h.ofertaService.ModificarOferta(uint(id), oferta)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error al modificar la oferta"})
+		return
+	}
+
+	c.JSON(http.StatusOK, updatedOferta)
+}

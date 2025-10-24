@@ -9,6 +9,8 @@ import (
 type OfertaRepository interface {
 	FindAll() ([]model.Oferta, error)
 	FindByID(id uint) (*model.Oferta, error)
+	Create(oferta model.Oferta) (*model.Oferta, error)
+	ModificarOferta(id uint, oferta model.Oferta) (*model.Oferta, error)
 }
 
 type ofertaRepository struct {
@@ -30,6 +32,19 @@ func (r *ofertaRepository) FindAll() ([]model.Oferta, error) {
 func (r *ofertaRepository) FindByID(id uint) (*model.Oferta, error) {
 	var oferta model.Oferta
 	if err := r.DB.First(&oferta, id).Error; err != nil {
+		return nil, err
+	}
+	return &oferta, nil
+}
+
+func (r *ofertaRepository) Create(oferta model.Oferta) (*model.Oferta, error) {
+	if err := r.DB.Create(&oferta).Error; err != nil {
+		return nil, err
+	}
+	return &oferta, nil
+}
+func (r *ofertaRepository) ModificarOferta(id uint, oferta model.Oferta) (*model.Oferta, error) {
+	if err := r.DB.Save(&oferta).Error; err != nil {
 		return nil, err
 	}
 	return &oferta, nil

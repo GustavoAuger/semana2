@@ -329,7 +329,7 @@ docker-compose restart oferta-service
 docker-compose restart especificacion-service
 ```
 
-## 🧹 Limpieza
+### 🧹 Limpieza
 
 ### Detener todos los servicios
 ```bash
@@ -339,6 +339,14 @@ docker-compose down
 ### Detener y eliminar volúmenes (⚠️ Elimina los datos de la BD)
 ```bash
 docker-compose down -v
+```
+
+**⚠️ NOTA IMPORTANTE:** Si modificas el script SQL (`scripts/init_db.sql`) y los cambios no se reflejan, necesitas limpiar los volúmenes de PostgreSQL porque persisten datos entre ejecuciones:
+
+```bash
+# Comando completo para empezar de cero
+docker-compose down -v
+docker-compose up --build
 ```
 
 ### Limpiar imágenes y caché de Docker
@@ -418,6 +426,28 @@ curl http://localhost:8080/api/http/routers
 - **Traefik v2.10**: API Gateway y reverse proxy
 - **Consul 1.15**: Service Discovery
 - **Docker & Docker Compose**: Containerización
+
+### Actualizacion para encuadrar con semana 4 frontend
+
+#### Eliminación de Datos
+
+Se implementa **Soft Delete** en lugar de eliminación física:
+
+#### Razones:
+- **Integridad referencial**: Mantiene relaciones entre especificaciones y ofertas
+- **Recuperación**: Permite reactivar elementos eliminados por error  
+- **Auditoría**: Conserva historial completo para análisis
+- **Microservicios**: Evita dependencias entre servicios separados
+
+#### Implementación:
+- Campo `activo` (boolean) en tabla especificaciones
+- Consultas filtran solo registros activos (`WHERE activo = true`)
+- Endpoint DELETE marca `activo = false` en lugar de eliminar
+
+#### Método post para crear oferta
+
+- Se implementa un método POST para crear una nueva oferta por relación 1:1 con especificaciones.
+
 
 ## 👥 Autor
 

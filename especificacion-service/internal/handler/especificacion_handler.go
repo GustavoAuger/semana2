@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"especificacion-service/internal/dto"
 	"especificacion-service/internal/model"
 	"especificacion-service/internal/service"
 
@@ -19,7 +18,7 @@ func NewEspecificacionHandler(service service.EspecificacionService) *Especifica
 	return &EspecificacionHandler{service: service}
 }
 
-// CreateEspecificacion crea una nueva especificación
+// CreateEspecificacion: crea una nueva especificación
 func (h *EspecificacionHandler) CreateEspecificacion(c *gin.Context) {
 	var especificacion model.Especificacion
 	if err := c.ShouldBindJSON(&especificacion); err != nil {
@@ -39,7 +38,7 @@ func (h *EspecificacionHandler) CreateEspecificacion(c *gin.Context) {
 	c.JSON(http.StatusCreated, especificacion)
 }
 
-// GetEspecificacion obtiene una especificación por su ID
+// GetEspecificacion: obtiene una especificación por su ID
 func (h *EspecificacionHandler) GetEspecificacion(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
@@ -56,7 +55,7 @@ func (h *EspecificacionHandler) GetEspecificacion(c *gin.Context) {
 	c.JSON(http.StatusOK, especificacion)
 }
 
-// GetEspecificacionPorOferta obtiene una especificación por el ID de la oferta
+// GetEspecificacionPorOferta: obtiene una especificación por el ID de la oferta
 func (h *EspecificacionHandler) GetEspecificacionPorOferta(c *gin.Context) {
 	ofertaID, err := strconv.ParseUint(c.Param("ofertaId"), 10, 32)
 	if err != nil {
@@ -120,10 +119,6 @@ func (h *EspecificacionHandler) ListEspecificaciones(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error al obtener las especificaciones"})
 		return
-	}
-
-	if especificaciones == nil {
-		especificaciones = []dto.EspecificacionResponse{} // Retornar array vacío en lugar de null
 	}
 
 	c.JSON(http.StatusOK, especificaciones)

@@ -8,6 +8,7 @@ import (
 type Especificacion struct {
 	gorm.Model
 	OfertaID          uint   `json:"oferta_id" gorm:"not null;index"`
+	Activo            bool   `json:"activo"`
 	NumeroVacantes    int    `json:"numero_vacantes" gorm:"type:int"`
 	PersonalACargo    int    `json:"personal_a_cargo" gorm:"type:int"`
 	TipoContrato      string `json:"tipo_contrato" gorm:"type:varchar(30)"`

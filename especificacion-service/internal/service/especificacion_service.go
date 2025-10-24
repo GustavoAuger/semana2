@@ -75,7 +75,7 @@ func (s *especificacionService) GetEspecificacionByOfertaID(ofertaID int) (*dto.
 
 func (s *especificacionService) CreateEspecificacion(especificacion *model.Especificacion) error {
 	// Verificar si ya existe una especificación para esta oferta
-	existing, _ := s.repo.FindByOfertaID(int(especificacion.OfertaID))
+	existing, _ := s.repo.FindByOfertaIDIncludingInactive(int(especificacion.OfertaID))
 	if existing != nil {
 		return errors.New("ya existe una especificación para esta oferta")
 	}
@@ -94,5 +94,5 @@ func (s *especificacionService) UpdateEspecificacion(especificacion *model.Espec
 }
 
 func (s *especificacionService) DeleteEspecificacion(id uint) error {
-	return s.repo.Delete(id)
+	return s.repo.SoftDelete(id) // Cambiar activo = false (cambio de semana4-ya no es eliminación fisica)
 }
